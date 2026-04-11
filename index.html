@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halit'in Özel Fiil Testi</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h2 { color: #333; }
+        .given { font-size: 24px; font-weight: bold; color: #007bff; margin-bottom: 20px; background: #e7f3ff; padding: 10px; border-radius: 10px; }
+        input { width: 90%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 18px; margin-top: 10px; }
+        button:hover { background: #218838; }
+        #result { margin-top: 15px; font-weight: bold; }
+        .correct { color: green; }
+        .wrong { color: red; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Fiil Testi 🚀</h2>
+        <p id="label"></p>
+        <div id="given-word" class="given"></div>
+        <div id="inputs"></div>
+        <button onclick="checkAnswer()">Kontrol Et</button>
+        <button onclick="nextQuestion()" style="background:#007bff; display:none;" id="nextBtn">Sıradaki Soru</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const verbs = [
+            ["be", "was/were", "been", "olmak"], ["become", "became", "become", "olmak"], ["begin", "began", "begun", "başlamak"],
+            ["break", "broke", "broken", "kırmak"], ["bring", "brought", "brought", "getirmek"], ["build", "built", "built", "inşa etmek"],
+            ["buy", "bought", "bought", "satın almak"], ["can", "could", "could", "ebilmek"], ["catch", "caught", "caught", "yakalamak"],
+            ["choose", "chose", "chosen", "seçmek"], ["come", "came", "come", "gelmek"], ["cost", "cost", "cost", "maliyetinde olmak"],
+            ["cut", "cut", "cut", "kesmek"], ["do", "did", "done", "yapmak"], ["draw", "drew", "drawn", "çizmek"],
+            ["drink", "drank", "drunk", "içmek"], ["drive", "drove", "driven", "sürmek"], ["eat", "ate", "eaten", "yemek"],
+            ["fall", "fell", "fallen", "düşmek"], ["feel", "felt", "felt", "hissetmek"], ["find", "found", "found", "bulmak"],
+            ["fly", "flew", "flown", "uçmak"], ["forget", "forgot", "forgotten", "unutmak"], ["get", "got", "got", "almak"],
+            ["give", "gave", "given", "vermek"], ["go", "went", "gone", "gitmek"], ["grow", "grew", "grown", "büyümek"],
+            ["have", "had", "had", "sahip olmak"], ["hear", "heard", "heard", "duymak"], ["keep", "kept", "kept", "tutmak"],
+            ["know", "knew", "known", "bilmek"]
+        ];
+
+        let currentVerb, givenIdx;
+        const labels = ["V1 (Base)", "V2 (Simple)", "V3 (Participle)", "Türkçe Anlamı"];
+
+        function nextQuestion() {
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('nextBtn').style.display = 'none';
+            currentVerb = verbs[Math.floor(Math.random() * verbs.length)];
+            givenIdx = Math.floor(Math.random() * 4);
+            
+            document.getElementById('label').innerText = labels[givenIdx] + " verildi:";
+            document.getElementById('given-word').innerText = currentVerb[givenIdx];
+            
+            let inputHtml = '';
+            for(let i=0; i<4; i++) {
+                if(i !== givenIdx) {
+                    inputHtml += `<input type="text" id="ans${i}" placeholder="${labels[i]} giriniz...">`;
+                }
+            }
+            document.getElementById('inputs').innerHTML = inputHtml;
+        }
+
+        function checkAnswer() {
+            let allCorrect = true;
+            for(let i=0; i<4; i++) {
+                if(i !== givenIdx) {
+                    let userVal = document.getElementById('ans'+i).value.trim().toLowerCase();
+                    let correctVal = currentVerb[i].toLowerCase();
+                    if(correctVal.includes('/') ? !correctVal.split('/').includes(userVal) : userVal !== correctVal) {
+                        allCorrect = false;
+                        document.getElementById('ans'+i).style.borderColor = 'red';
+                    } else {
+                        document.getElementById('ans'+i).style.borderColor = 'green';
+                    }
+                }
+            }
+            if(allCorrect) {
+                document.getElementById('result').innerHTML = '<span class="correct">Harika! Hepsi doğru. ✨</span>';
+                document.getElementById('nextBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('result').innerHTML = '<span class="wrong">Bazıları hatalı, tekrar dene! ❌</span>';
+            }
+        }
+        nextQuestion();
+    </script>
+</body>
+</html>
