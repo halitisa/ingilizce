@@ -5,26 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halit'in Özel Fiil Testi</title>
     <style>
-        body { font-family: sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h2 { color: #333; }
-        .given { font-size: 24px; font-weight: bold; color: #007bff; margin-bottom: 20px; background: #e7f3ff; padding: 10px; border-radius: 10px; }
-        input { width: 90%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
-        button { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 18px; margin-top: 10px; }
-        button:hover { background: #218838; }
-        #result { margin-top: 15px; font-weight: bold; }
-        .correct { color: green; }
-        .wrong { color: red; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        h2 { color: #1a73e8; margin-top: 0; }
+        .given { font-size: 26px; font-weight: bold; color: #1a73e8; margin-bottom: 20px; background: #e8f0fe; padding: 15px; border-radius: 12px; border: 1px solid #d2e3fc; }
+        .label-text { font-size: 14px; color: #5f6368; margin-bottom: 5px; text-align: left; margin-left: 5%; }
+        input { width: 90%; padding: 12px; margin: 5px 0 15px 0; border: 2px solid #dadce0; border-radius: 8px; font-size: 16px; transition: 0.3s; }
+        button { color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 18px; width: 100%; margin-top: 10px; font-weight: bold; }
+        #checkBtn { background: #1a73e8; }
+        #showAnsBtn { background: #f4b400; display: none; }
+        #nextBtn { background: #34a853; display: none; }
+        #result { margin-top: 20px; font-size: 16px; }
+        .answer-list { text-align: left; background: #fff4e5; padding: 15px; border-radius: 8px; border: 1px solid #ffe1b5; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>Fiil Testi 🚀</h2>
-        <p id="label"></p>
+        <div id="label" style="font-size: 14px; color: #5f6368; margin-bottom: 8px;"></div>
         <div id="given-word" class="given"></div>
         <div id="inputs"></div>
-        <button onclick="checkAnswer()">Kontrol Et</button>
-        <button onclick="nextQuestion()" style="background:#007bff; display:none;" id="nextBtn">Sıradaki Soru</button>
+        <button onclick="checkAnswer()" id="checkBtn">Kontrol Et</button>
+        <button onclick="showAnswers()" id="showAnsBtn">Cevapları Göster (3 Hak Bitti)</button>
+        <button onclick="nextQuestion()" id="nextBtn">Sıradaki Soru ➔</button>
         <div id="result"></div>
     </div>
 
@@ -43,12 +46,15 @@
             ["know", "knew", "known", "bilmek"]
         ];
 
-        let currentVerb, givenIdx;
+        let currentVerb, givenIdx, wrongCount = 0;
         const labels = ["V1 (Base)", "V2 (Simple)", "V3 (Participle)", "Türkçe Anlamı"];
 
         function nextQuestion() {
+            wrongCount = 0;
             document.getElementById('result').innerHTML = '';
             document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('showAnsBtn').style.display = 'none';
+            document.getElementById('checkBtn').style.display = 'block';
             currentVerb = verbs[Math.floor(Math.random() * verbs.length)];
             givenIdx = Math.floor(Math.random() * 4);
             
@@ -58,7 +64,7 @@
             let inputHtml = '';
             for(let i=0; i<4; i++) {
                 if(i !== givenIdx) {
-                    inputHtml += `<input type="text" id="ans${i}" placeholder="${labels[i]} giriniz...">`;
+                    inputHtml += `<div class="label-text">${labels[i]}</div><input type="text" id="ans${i}" placeholder="Cevap...">`;
                 }
             }
             document.getElementById('inputs').innerHTML = inputHtml;
@@ -70,21 +76,42 @@
                 if(i !== givenIdx) {
                     let userVal = document.getElementById('ans'+i).value.trim().toLowerCase();
                     let correctVal = currentVerb[i].toLowerCase();
-                    if(correctVal.includes('/') ? !correctVal.split('/').includes(userVal) : userVal !== correctVal) {
+                    let isMatch = correctVal.includes('/') ? correctVal.split('/').includes(userVal) : userVal === correctVal;
+                    
+                    if(!isMatch) {
                         allCorrect = false;
-                        document.getElementById('ans'+i).style.borderColor = 'red';
+                        document.getElementById('ans'+i).style.borderColor = '#d93025';
                     } else {
-                        document.getElementById('ans'+i).style.borderColor = 'green';
+                        document.getElementById('ans'+i).style.borderColor = '#1e8e3e';
                     }
                 }
             }
+
             if(allCorrect) {
-                document.getElementById('result').innerHTML = '<span class="correct">Harika! Hepsi doğru. ✨</span>';
-                document.getElementById('nextBtn').style.display = 'inline-block';
+                document.getElementById('result').innerHTML = '<span style="color:green; font-weight:bold;">Mükemmel! ✨</span>';
+                document.getElementById('checkBtn').style.display = 'none';
+                document.getElementById('nextBtn').style.display = 'block';
             } else {
-                document.getElementById('result').innerHTML = '<span class="wrong">Bazıları hatalı, tekrar dene! ❌</span>';
+                wrongCount++;
+                if(wrongCount >= 3) {
+                    document.getElementById('result').innerHTML = `<span style="color:red;">3 kez hatalı deneme yaptın.</span>`;
+                    document.getElementById('showAnsBtn').style.display = 'block';
+                } else {
+                    document.getElementById('result').innerHTML = `<span style="color:orange;">Hatalı! Tekrar dene. (Kalan hak: ${3 - wrongCount})</span>`;
+                }
             }
         }
+
+        function showAnswers() {
+            let feedback = '<div class="answer-list"><strong>Doğru Cevaplar:</strong><br>';
+            for(let i=0; i<4; i++) { feedback += `${labels[i]}: ${currentVerb[i]}<br>`; }
+            feedback += '</div>';
+            document.getElementById('result').innerHTML = feedback;
+            document.getElementById('showAnsBtn').style.display = 'none';
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
         nextQuestion();
     </script>
 </body>
